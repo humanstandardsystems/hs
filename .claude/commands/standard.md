@@ -126,7 +126,14 @@ Use AskUserQuestion with these 2 questions:
   - label: "Business contact" | description: "A business partner, colleague, or professional contact"
   - label: "Legal executor" | description: "My attorney, executor, or estate representative"
 
-After batch 3, ask in plain text: "Last two things — what's your name, and what's the name of your business or LLC?" Wait for their response before continuing.
+After batch 3, ask in plain text:
+
+> "Almost done — three quick things:
+> 1. What's your name?
+> 2. What's the name of your business or LLC? (Legal name is only used to organize your setup — it won't be shared or used for anything formal.)
+> 3. What companies or clients do you work with regularly? List each one by name, one per line — legal name just helps keep your folders organized. Skip this if it's just you."
+
+Wait for their full response before continuing. Parse it for: name, business name, and a list of company/client names (may be empty).
 
 ---
 
@@ -180,6 +187,26 @@ Write completed documents to:
 
 Do not modify or overwrite anything in `_governance/templates/`.
 
+### Business folder structure
+
+For each company or client name collected (including their own business):
+
+1. Create a folder at `businesses/<exact name as provided>/`
+2. Inside it, create `memory.md` with this template:
+
+```markdown
+# <Company Name>
+
+## About
+_(Add notes about this company here — type of work, key contacts, context.)_
+
+## Notes
+```
+
+If the companies list is empty, skip this step entirely — do not create the `businesses/` folder.
+
+Do not rename, slugify, or alter the company names. Use them exactly as the user provided.
+
 ---
 
 ## Step 7 — Completion
@@ -188,4 +215,4 @@ Say:
 
 > "Your governance is set up. These four documents define how AI works for you — what it can do, what it can't, and who stays in charge. You'll find them in the _governance/ folder anytime you need them. Welcome to Human Standard."
 
-Then list the four documents with a one-line description of each.
+Then list the four governance documents with a one-line description of each. If the `businesses/` folder was created, also list each company folder and note that their `memory.md` is ready to fill in.

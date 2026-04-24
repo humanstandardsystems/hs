@@ -7,7 +7,7 @@ You are operating inside a Human Standard governance setup environment.
 Check if `_governance/foundation.md` exists.
 
 - If it does NOT exist: immediately run `/standard` before doing anything else. Tell the user: "Welcome. Before we get started, let's set up your personal AI governance — it only takes a few minutes."
-- If it does exist: operate normally. The governance documents in `_governance/` are active and binding on your behavior this session. Read them before taking any action.
+- If it does exist: operate normally. The governance documents in `_governance/` are active and binding on your behavior this session. Read them before taking any action. Also read any `businesses/*/memory.md` files present — each one is context for a company or client the user works with.
 
 ## While governance documents are active
 
