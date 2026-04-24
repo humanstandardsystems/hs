@@ -55,7 +55,7 @@ HOOK_BLOCK='{
         "hooks": [
           {
             "type": "command",
-            "command": "bash .claude/hooks/startup-governance.sh"
+            "command": "bash $TARGET/.claude/hooks/startup-governance.sh"
           }
         ]
       }
@@ -70,7 +70,7 @@ import sys, json
 with open(sys.argv[1]) as f:
     existing = json.load(f)
 
-new_hooks = {"UserPromptSubmit": [{"hooks": [{"type": "command", "command": "bash .claude/hooks/startup-governance.sh"}]}]}
+new_hooks = {"UserPromptSubmit": [{"hooks": [{"type": "command", "command": "bash $TARGET/.claude/hooks/startup-governance.sh"}]}]}
 
 if "hooks" not in existing:
     existing["hooks"] = {}
