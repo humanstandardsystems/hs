@@ -10,15 +10,21 @@ _Last updated: ____ (session 0)_
 
 ---
 
-## key decisions
+## environment
+
+_Add stable facts here: paths, tool versions, credentials location, etc._
 
 ---
 
-## next steps / open threads
+## next steps
+
+_Actionable queue. Remove completed items each session._
 
 ---
 
 ## session log
+
+_Keep last 5 sessions. Older rows go to lab/session-archive.md._
 
 | date | summary |
 |------|---------|
