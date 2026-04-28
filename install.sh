@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # install.sh — set up a Human Standard governance environment
-# Usage: bash /path/to/governance-setup/install.sh [target-dir]
+# Usage: bash /path/to/hs/install.sh [target-dir]
 # Defaults to current directory if no target is given.
 
 set -euo pipefail
@@ -9,7 +9,7 @@ SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TARGET="${1:-$(pwd)}"
 
 if [ "$TARGET" = "$SOURCE_DIR" ]; then
-    echo "error: target cannot be the governance-setup repo itself." >&2
+    echo "error: target cannot be the hs repo itself." >&2
     exit 1
 fi
 

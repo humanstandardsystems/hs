@@ -1,4 +1,4 @@
-# governance-setup
+# hs
 
 A plug-and-play environment for building your personal AI governance inside Claude Code.
 
@@ -11,9 +11,9 @@ Built on the [Human Standard](https://humanstandard.co) framework.
 ## Setup
 
 ```bash
-git clone https://github.com/humanstandardsystems/governance-setup.git
+git clone https://github.com/humanstandardsystems/hs.git
 cd your-project
-bash /path/to/governance-setup/install.sh
+bash /path/to/hs/install.sh
 ```
 
 Then open Claude Code in your project and run:
