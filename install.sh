@@ -5,7 +5,7 @@
 #
 # Installs:
 #   - Project-level: governance scaffold, /standard, startup hook, CLAUDE.md, settings.json
-#   - User-level:    /done command, brain protocol tools (brain.py + 6 commands)
+#   - User-level:    /done command
 #   - User-level:    ICM hooks (if icm is installed via brew)
 #   - Project root:  primer.md template (only if missing)
 
@@ -27,7 +27,6 @@ mkdir -p "$TARGET/.claude/commands"
 mkdir -p "$TARGET/.claude/hooks"
 mkdir -p "$TARGET/_governance/templates"
 mkdir -p "$USER_CLAUDE/commands"
-mkdir -p "$USER_CLAUDE/scripts"
 
 # ── Copy Claude commands (project) ───────────────────────────────────────────
 cp "$SOURCE_DIR/.claude/commands/standard.md" "$TARGET/.claude/commands/"
@@ -111,14 +110,6 @@ fi
 cp "$SOURCE_DIR/commands/done.md" "$USER_CLAUDE/commands/done.md"
 echo "  installed /done command (user-level)"
 
-# ── Install brain protocol bundle (user-level) ───────────────────────────────
-cp "$SOURCE_DIR/scripts/brain.py" "$USER_CLAUDE/scripts/brain.py"
-chmod +x "$USER_CLAUDE/scripts/brain.py"
-for cmd in decide todo done-todo glossary context sync; do
-    cp "$SOURCE_DIR/commands/$cmd.md" "$USER_CLAUDE/commands/$cmd.md"
-done
-echo "  installed brain protocol (brain.py + 6 commands)"
-
 # ── Drop primer.md template at project root (only if missing) ────────────────
 PRIMER="$TARGET/primer.md"
 if [ -f "$PRIMER" ]; then
@@ -196,6 +187,5 @@ echo "Done. Next steps:"
 echo "  1. Open Claude Code in $TARGET"
 echo "  2. Run /standard to build your personal governance"
 echo "  3. Edit primer.md to capture current project state"
-echo "  4. (optional) Add 'brain: <repo-url>' to CLAUDE.md to enable shared brain"
 echo ""
 echo "Your governance loads automatically every session."
