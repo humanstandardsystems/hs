@@ -14,7 +14,7 @@ SESSION_FILE="$GOVERNANCE_DIR/.session"
 
 # Identify the current session by transcript path
 INPUT=$(cat)
-TRANSCRIPT=$(echo "$INPUT" | jq -r '.transcript_path // ""' 2>/dev/null)
+TRANSCRIPT=$(echo "$INPUT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('transcript_path',''))" 2>/dev/null)
 [ -z "$TRANSCRIPT" ] && exit 0
 
 # Check if we already injected for this session

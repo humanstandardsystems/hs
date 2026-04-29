@@ -6,6 +6,13 @@ Built on the [Human Standard](https://humanstandard.co) framework.
 
 ---
 
+## Requirements
+
+- [Claude Code](https://claude.ai/download) — the CLI that runs everything
+- macOS or Linux, `bash`, `python3` (pre-installed on modern macOS)
+
+---
+
 ## Setup
 
 ```bash
