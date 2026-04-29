@@ -56,7 +56,7 @@ Use AskUserQuestion with these 4 questions:
 - header: "Your voice"
 - multiSelect: false
 - options:
-  - label: "Always approve" | description: "Never — I review everything before it goes out"
+  - label: "I approve everything" | description: "I review every outgoing message before it sends"
   - label: "Drafts only" | description: "Drafts are fine, but I always approve before sending"
   - label: "Routine is ok" | description: "Simple replies could be automated; important things need review"
 
@@ -116,6 +116,7 @@ Use AskUserQuestion with these 2 questions:
   - label: "Full approval" | description: "Nothing moves without my explicit approval"
   - label: "Informed + stop" | description: "I stay informed and can stop or undo anything at any time"
   - label: "My responsibility" | description: "AI helps me, but the responsibility always stays with me"
+  - label: "Delegated alerts" | description: "AI handles routine operations and notifies me of exceptions"
 
 **Q10**
 - question: "Who would you trust to manage your digital presence if something happened to you?"
@@ -145,28 +146,33 @@ Read each template from `_governance/templates/`. Personalize based on answers. 
 
 **foundation.md**
 - Replace `{{AUTHOR_NAME}}` with their name throughout
-- Replace `{{CONTROLLED_ENTITY}}` with their business name
-- Q3 → expand the Authority Limits prohibited list with their specific concerns written as plain rules
+- Replace `{{CONTROLLED_ENTITY}}` with their business name. If no business name was provided, omit the "It extends to any entity..." sentence from the Scope section entirely.
+- Q3 → expand the Authority Limits prohibited list. If preset options were selected, write each as a plain rule. If the user said "nothing," "none," or expressed no limits, omit the additional prohibitions block entirely. If free-form text was provided, honor it and write it as a plain rule.
 - Q4 → set Representation Restriction tone:
-  - "Always approve" = zero-tolerance language, hard prohibition on anything unseen
+  - "I approve everything" = zero-tolerance language, hard prohibition on anything unseen
   - "Drafts only" = review-required language, drafts permitted, sending never
   - "Routine is ok" = tiered language, routine permitted, material requires review
+  - No preference / "I don't care" / other = write: "{{AUTHOR_NAME}} has not established a restriction on AI representation. Drafts are permissible. Consequential communications require review before sending."
 - Q7 → set Cognitive Sovereignty language:
   - "No profiling" = hard prohibition on pattern analysis and retention
   - "Task-only" = scoped analysis permitted, zero retention
   - "With disclosure" = analysis permitted with prior disclosure
-- Q8 → add a "Personal Boundaries" section after Cognitive Sovereignty. Write each selected concern as a named plain-language rule. If "Other" text was provided, incorporate it.
+  - General openness / other = write: "{{AUTHOR_NAME}} permits ongoing pattern analysis and learning. Disclosure of significant behavioral profiling is preferred but not required."
+- Q8 → add a "Personal Boundaries" section after Cognitive Sovereignty. Write each selected concern as a named plain-language rule. If "Other" text was provided, incorporate it. If the user had no concerns or selected nothing, omit this section entirely.
 
 **interpretation.md**
 - Replace `{{AUTHOR_NAME}}` with their name
 - Q2 → populate permitted uses list in Business domain from their selections
-- Q5 → add as explicit confidentiality requirements under Business domain
+- Q5 → set client data rules under Business domain:
+  - Restrictive options selected (Task-only use, No retention, No sharing) = add each as a named prohibition
+  - Permissive / "use everything" / other = write: "{{AUTHOR_NAME}} authorizes broad use of client information in service of stated task objectives, subject to the Authority Limits in the Foundation."
+  - No answer = omit this section
 - Q6 → "Just me" = omit Organizational domain section entirely; "Sometimes" or "Yes, regularly" = include it
 - Q7 → set memory and data retention rules per domain to match their stance
 
 **policy.md**
 - Replace `{{AUTHOR_NAME}}` with their name
-- Replace `{{CONTROLLED_ENTITY}}` with their business name
+- Replace `{{CONTROLLED_ENTITY}}` with their business name. If no business name was provided, omit the Controlled Entities section entirely.
 - Q10 → name the steward role. If they provided a name, use it. Otherwise use their selected description (e.g., "a designated family member", "a trusted business partner")
 
 **enforcement.md**
@@ -175,6 +181,8 @@ Read each template from `_governance/templates/`. Personalize based on answers. 
   - "Full approval" = explicit approval-gate framing
   - "Informed + stop" = transparency and revocability framing
   - "My responsibility" = human accountability framing
+  - "Delegated alerts" = AI-mediation framing: AI systems may handle routine operations and notify {{AUTHOR_NAME}} of exceptions. {{AUTHOR_NAME}} retains override authority at all times.
+  - Other / free-form = interpret the user's stated position and write a framing that reflects it honestly
 
 ### Output locations
 
