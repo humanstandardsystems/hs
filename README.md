@@ -72,4 +72,4 @@ The questionnaire asks about your philosophy, fears, and desires — not technic
 
 ## License
 
-MIT
+[MIT](LICENSE) — Copyright (c) 2026 Human Standard
