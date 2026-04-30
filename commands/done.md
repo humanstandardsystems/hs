@@ -21,6 +21,25 @@ Scan `plugins/*/plugin.json` at the project root. For each file found:
 
 If no `plugins/` directory exists or no plugins declare a `done_hook`, skip this step.
 
-## 3. Confirm
+## 3. Store session summary to ICM
+
+Review the full session conversation for anything worth remembering long-term. Store each significant item using `icm_memory_store`. Skip this step entirely if ICM tools are unavailable.
+
+What to store and how:
+
+| What happened | topic | importance |
+|---|---|---|
+| Decision made (architecture, tooling, design) | `decisions-{project}` | high |
+| Error diagnosed and resolved | `errors-resolved` | high |
+| Feature or significant task completed | `context-{project}` | high |
+| User preference or working style discovered | `preferences` | critical |
+
+Rules:
+- Derive `{project}` from the primer.md project name or CLAUDE.md identity. If unclear, use `general`.
+- One store call per distinct item. Don't bundle unrelated things.
+- Skip items already captured in primer.md that have no long-term reuse value.
+- If nothing significant happened, skip silently.
+
+## 4. Confirm
 
 Say "primer updated." — nothing more.
