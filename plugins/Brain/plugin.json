@@ -1,7 +1,0 @@
-{
-  "name": "Brain",
-  "version": "1.0.0",
-  "description": "Shared git-backed knowledge base across machines and collaborators. Adds /decide, /todo, /glossary, /context, /done-todo, /sync.",
-  "done_hook": "plugins/Brain/done.md",
-  "priority": 50
-}
