@@ -6,7 +6,7 @@
 # Installs:
 #   - Project-level: governance scaffold, /standard, startup hook, CLAUDE.md, settings.json
 #   - User-level:    /done command
-#   - User-level:    ICM hooks (if icm is installed via brew)
+#   - User-level:    ICM hooks (required — install via: brew install rtk-ai/icm/icm)
 #   - Project root:  primer.md template (only if missing)
 
 set -euo pipefail
@@ -119,18 +119,19 @@ else
     echo "  created primer.md template"
 fi
 
-# ── Wire ICM hooks into user settings.json (if icm is installed) ─────────────
+# ── Wire ICM hooks into user settings.json (required) ────────────────────────
 USER_SETTINGS="$USER_CLAUDE/settings.json"
 ICM_BIN="$(command -v icm || true)"
 
 if [ -z "$ICM_BIN" ]; then
-    echo ""
-    echo "  ICM not detected — skipping memory hooks."
-    echo "  To enable long-term memory across sessions:"
-    echo "    brew install rtk-ai/icm/icm"
-    echo "    then re-run this installer."
-else
-    python3 - "$USER_SETTINGS" "$ICM_BIN" <<'PY'
+    echo "" >&2
+    echo "error: ICM is required but not installed." >&2
+    echo "  Install it first, then re-run this installer:" >&2
+    echo "    brew install rtk-ai/icm/icm" >&2
+    exit 1
+fi
+
+python3 - "$USER_SETTINGS" "$ICM_BIN" <<'PY'
 import sys, json, os
 
 settings_path, icm_bin = sys.argv[1], sys.argv[2]
@@ -180,7 +181,6 @@ if added:
 else:
     print("  ICM hooks already wired — nothing to do")
 PY
-fi
 
 echo ""
 echo "Done. Next steps:"
