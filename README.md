@@ -40,7 +40,7 @@ Claude will guide you through the governance questionnaire.
 
 **User-level (in `~/.claude/`)**
 - `/done` — end-of-session ritual: updates `primer.md`
-- ICM memory hooks (auto-wired if [`icm`](https://github.com/rtk-ai/icm) is installed via brew)
+- ICM memory hooks (requires [`icm`](https://github.com/rtk-ai/icm) — `brew install rtk-ai/icm/icm`)
 
 ---
 
@@ -67,19 +67,6 @@ Four documents written to `_governance/`:
 | `policy.md` | What happens to your AI systems if something happens to you |
 
 The questionnaire asks about your philosophy, fears, and desires — not technical preferences. The structure stays tight; your voice fills it in.
-
----
-
-## Plugins
-
-Everything beyond the core is a plugin. Plugins live in `plugins/<Name>/` and are opt-in.
-
-| Plugin | What it adds |
-|--------|-------------|
-| **Brain** | Shared git-backed knowledge across machines and collaborators. `/decide`, `/todo`, `/glossary`, etc. |
-| **Lens** | Token spend observability. Session cost + weekly totals in the status bar. |
-
-Plugins are not installed by default. See `plugins/<Name>/` for setup instructions.
 
 ---
 
