@@ -16,6 +16,10 @@ Built on the [Human Standard](https://humanstandard.co) framework.
 ## Setup
 
 ```bash
+# 1. Install ICM (required)
+brew tap rtk-ai/tap && brew install icm && icm init
+
+# 2. Clone and install
 git clone https://github.com/humanstandardsystems/hs.git
 cd your-project
 bash /path/to/hs/install.sh
@@ -40,7 +44,7 @@ Claude will guide you through the governance questionnaire.
 
 **User-level (in `~/.claude/`)**
 - `/done` — end-of-session ritual: updates `primer.md`
-- ICM memory hooks (requires [`icm`](https://github.com/rtk-ai/icm) — `brew install rtk-ai/icm/icm`)
+- ICM memory hooks (requires [`icm`](https://github.com/rtk-ai/icm) — `brew tap rtk-ai/tap && brew install icm && icm init`)
 
 ---
 

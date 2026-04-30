@@ -6,7 +6,7 @@
 # Installs:
 #   - Project-level: governance scaffold, /standard, startup hook, CLAUDE.md, settings.json
 #   - User-level:    /done command
-#   - User-level:    ICM hooks (required — install via: brew install rtk-ai/icm/icm)
+#   - User-level:    ICM hooks (required — install via: brew tap rtk-ai/tap && brew install icm && icm init)
 #   - Project root:  primer.md template (only if missing)
 
 set -euo pipefail
@@ -134,7 +134,7 @@ if [ -z "$ICM_BIN" ]; then
     echo "" >&2
     echo "error: ICM is required but not installed." >&2
     echo "  Install it first, then re-run this installer:" >&2
-    echo "    brew install rtk-ai/icm/icm" >&2
+    echo "    brew tap rtk-ai/tap && brew install icm && icm init" >&2
     exit 1
 fi
 
