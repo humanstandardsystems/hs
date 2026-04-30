@@ -145,6 +145,7 @@ Read each template from `_governance/templates/`. Personalize based on answers. 
 ### Answer → document mapping
 
 **foundation.md**
+- Replace `{{DATE}}` with today's date (YYYY-MM-DD)
 - Replace `{{AUTHOR_NAME}}` with their name throughout
 - Replace `{{CONTROLLED_ENTITY}}` with their business name. If no business name was provided, omit the "It extends to any entity..." sentence from the Scope section entirely.
 - Q3 → expand the Authority Limits prohibited list. If preset options were selected, write each as a plain rule. If the user said "nothing," "none," or expressed no limits, omit the additional prohibitions block entirely. If free-form text was provided, honor it and write it as a plain rule.

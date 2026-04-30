@@ -28,6 +28,13 @@ mkdir -p "$TARGET/.claude/hooks"
 mkdir -p "$TARGET/_governance/templates"
 mkdir -p "$USER_CLAUDE/commands"
 
+# ── Gitignore — exclude session state file ───────────────────────────────────
+GITIGNORE="$TARGET/.gitignore"
+if ! grep -qF "_governance/.session" "$GITIGNORE" 2>/dev/null; then
+    echo "_governance/.session" >> "$GITIGNORE"
+    echo "  added _governance/.session to .gitignore"
+fi
+
 # ── Copy Claude commands (project) ───────────────────────────────────────────
 cp "$SOURCE_DIR/.claude/commands/standard.md" "$TARGET/.claude/commands/"
 echo "  copied /standard command"

@@ -24,7 +24,7 @@ _Actionable queue. Remove completed items each session._
 
 ## session log
 
-_Keep last 5 sessions. Older rows go to lab/session-archive.md._
+_Keep last 5 sessions._
 
 | date | summary |
 |------|---------|
