@@ -171,10 +171,32 @@ fi
 USER_SETTINGS="$USER_CLAUDE/settings.json"
 ICM_BIN="$(command -v icm || true)"
 
+# Fallback: subshells (e.g. spawned by Claude Code's Bash tool) may not have
+# brew shellenv loaded, so command -v misses icm even when it's installed.
+# Check the canonical Homebrew bin paths directly before giving up.
+if [ -z "$ICM_BIN" ]; then
+    for candidate in /opt/homebrew/bin/icm /usr/local/bin/icm; do
+        if [ -x "$candidate" ]; then
+            ICM_BIN="$candidate"
+            break
+        fi
+    done
+fi
+
 if [ -z "$ICM_BIN" ]; then
     echo ""
     echo "ICM (memory layer) is required but not installed."
-    if ! command -v brew >/dev/null 2>&1; then
+    BREW_BIN="$(command -v brew || true)"
+    if [ -z "$BREW_BIN" ]; then
+        for candidate in /opt/homebrew/bin/brew /usr/local/bin/brew; do
+            if [ -x "$candidate" ]; then
+                BREW_BIN="$candidate"
+                eval "$("$BREW_BIN" shellenv)"
+                break
+            fi
+        done
+    fi
+    if [ -z "$BREW_BIN" ]; then
         echo "error: Homebrew isn't installed either. Install brew first:" >&2
         echo "  /bin/bash -c \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\"" >&2
         echo "Then re-run this installer." >&2
