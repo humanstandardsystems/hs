@@ -15,11 +15,12 @@ Update the `_Last updated:` line. Write primer.md back.
 
 ## 2. Run plugin done hooks
 
-Scan `plugins/*/plugin.json` at the project root. For each file found:
+Scan `~/.claude/sources/*/plugin.json`. For each file found:
 - Read it and check for a `done_hook` field
-- If present, read the file at that path and follow its instructions
+- If present, read the file at that path (relative to the plugin's repo root) and follow its instructions
+- Run hooks in order of the manifest's top-level `priority` field (lower = earlier; default 50)
 
-If no `plugins/` directory exists or no plugins declare a `done_hook`, skip this step.
+If `~/.claude/sources/` doesn't exist or no plugins declare a `done_hook`, skip this step silently. Repos in `~/.claude/sources/` without a `plugin.json` are not plugins — skip them.
 
 ## 3. Store session summary to ICM
 
