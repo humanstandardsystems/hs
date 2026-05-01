@@ -19,17 +19,21 @@ The same shape applies to `/done` (session-end orchestrator) and any future life
 
 ## What is a plugin?
 
-A folder under `<repo-root>/plugins/<Name>/` containing at minimum:
+A standalone git repo cloned to `~/.claude/sources/<name>/` containing at minimum a `plugin.json` manifest at the repo root:
 
 ```
-plugins/<Name>/
-├── plugin.json        # manifest (required)
+~/.claude/sources/<name>/
+├── plugin.json        # manifest (REQUIRED — this file is what makes it a plugin)
 ├── boot.md            # optional — Claude instructions for /rise
 ├── done.md            # optional — Claude instructions for /done
-└── hud_section.py     # optional — only if plugin contributes to HUD
+├── hud_section.py     # optional — only if plugin contributes to HUD
+├── install.sh         # optional but recommended — clone+install pattern
+└── ...                # plugin-specific code, assets, etc.
 ```
 
-A plugin is **opt-in** to each lifecycle: present `boot.md` → /rise runs it; present `done.md` → /done runs it; declare `hud.section` contribution → HUD plugin captures and frames its output.
+A plugin is **opt-in** to each lifecycle: declare `boot_hook` → /rise runs it; declare `done_hook` → /done runs it; declare `contributes.hud.section` → HUD plugin captures and frames its output.
+
+**The manifest is the contract.** No `plugin.json` = not a plugin = invisible to discovery. A repo without a manifest sitting in `~/.claude/sources/` (e.g. `hs` itself) is ignored.
 
 ---
 
@@ -69,8 +73,8 @@ Future contribution types (declared but not implemented in v1): `slash_commands`
 
 ### `/rise` (boot)
 
-1. Scan `<repo-root>/plugins/*/plugin.json`. Sort by top-level `priority`.
-2. For each plugin with `boot_hook`: read the markdown file, follow instructions in order.
+1. Scan `~/.claude/sources/*/plugin.json`. Sort by top-level `priority`.
+2. For each plugin with `boot_hook`: read the markdown file (relative to the plugin's repo root), follow instructions in order.
 3. The HUD plugin's `boot_hook` is what discovers other plugins' `hud.section` contributions and frames them. `/rise` itself does not render.
 
 ### `/done` (end of session)
@@ -90,7 +94,7 @@ Future contribution types (declared but not implemented in v1): `slash_commands`
 A plugin contributing to HUD writes `hud_section.py`:
 
 ```python
-# plugins/Pets/hud_section.py
+# ~/.claude/sources/pets/hud_section.py
 from hud.render import section, line, meter, divider
 
 def render():
@@ -110,7 +114,7 @@ The HUD plugin's `boot.md` instructs Claude to:
 3. For each plugin with `contributes.hud.section`, in priority order: import its `renderer` module, capture stdout while calling `render()`, weave captured lines into the frame.
 4. Close the frame.
 
-Plugins remain debug-runnable standalone — `python3 plugins/Pets/hud_section.py` prints the unframed BUDDY block directly.
+Plugins remain debug-runnable standalone — `python3 ~/.claude/sources/pets/hud_section.py` prints the unframed BUDDY block directly.
 
 ---
 
@@ -126,15 +130,17 @@ Importable Python module shipped by the HUD plugin. Plugin authors `from hud.ren
 
 Color constants (`C`, `G`, `Y`, `BR`, `BG`, etc.) are exposed for plugins that need raw ANSI. Most plugins won't.
 
-The render library lives in `plugins/HUD/render/` and is added to `sys.path` by the HUD plugin's boot before any plugin's `hud_section.py` is imported.
+The render library lives in the HUD plugin's repo (e.g. `~/.claude/sources/hud/render/`) and is added to `sys.path` by the HUD plugin's boot before any plugin's `hud_section.py` is imported.
 
 ---
 
 ## Discovery rules
 
-`/rise` (and HUD) discover plugins under `<repo-root>/plugins/*/`. Repo root is determined by walking up from CWD until a `.git` directory is found, OR until a `CLAUDE.md` is found at the candidate root, whichever comes first.
+Lifecycle orchestrators (`/rise`, `/done`, etc.) scan `~/.claude/sources/*/plugin.json`. Each match is a plugin. Sort by top-level `priority` before running hooks.
 
-Plugins are project-scoped by default. Universal plugins (e.g. Brain, which has no project-specific state of its own) MAY later be promoted to `~/.claude/plugins/` with project-overrides-user precedence. Phase 1 keeps this simple: per-project only.
+Plugins are **user-level**, not project-scoped. Once cloned, a plugin is active in every workspace that runs `/rise` or `/done`. Plugins that need project-specific behavior should branch on CWD or read project-local config inside their hook scripts.
+
+There is no project-local plugin discovery path. `<project>/plugins/` was the v0 model and is no longer scanned — it was retired when the clone+install distribution pattern landed.
 
 ---
 
@@ -142,26 +148,38 @@ Plugins are project-scoped by default. Universal plugins (e.g. Brain, which has 
 
 | What | Where | Why |
 |------|-------|-----|
-| `/rise` orchestrator | `~/.claude/scripts/rise.py` | One copy. Universal. Future: installed by `hs install`. |
+| `/rise` orchestrator | `~/.claude/scripts/rise.py` | One copy. Universal. |
 | `/rise` slash command | `~/.claude/commands/rise.md` | Points at the user-level orchestrator. |
-| Plugins | `<repo>/plugins/<Name>/` | Project-scoped. Discovered relative to repo root. |
-| HUD plugin | `<repo>/plugins/HUD/` | Visual frame + render library + core sections. |
+| `/done` slash command | `~/.claude/commands/done.md` | Installed by `hs install.sh`. Scans plugin sources. |
+| Plugins | `~/.claude/sources/<name>/` | User-level. Cloned via clone+install pattern. |
+| HUD plugin | `~/.claude/sources/hud/` (or wherever its repo lives) | Visual frame + render library + core sections. |
 | Plugin contract spec | `hs/docs/plugin-contract.md` | This file. Canonical reference. |
 
-Per-project copies of `rise.py` (currently in `r29k/.claude/`, `humanstandard/.claude/`, `claude-buddy/.claude/`) get overridden once the user-level version is stable. Either deleted, or replaced with a thin shim that `exec`s the user-level one.
+## Distribution
+
+Every distributable plugin follows the same install pattern:
+
+```bash
+git clone <plugin-repo> ~/.claude/sources/<name>
+bash ~/.claude/sources/<name>/install.sh
+```
+
+`install.sh` typically wires the plugin into `~/.claude/settings.json` (hooks, env), copies any user-level slash commands, and registers itself with whatever lifecycle hooks it declares. The plugin's source lives at `~/.claude/sources/<name>/` permanently — `update.sh` is just `git pull`, `uninstall.sh` reverses the install steps.
+
+Any tool sitting in `~/.claude/sources/` without a `plugin.json` (like `hs` itself, or a manually-cloned repo) is invisible to plugin discovery. That's the safety property — the directory can hold anything; only manifests get picked up.
 
 ---
 
-## Migration plan (Phase 1 implementation)
+## Migration plan (Phase 1 implementation) — ALL DONE ✓
 
-1. Move existing `rise.py` → `~/.claude/scripts/rise.py` as-is. Update slash command. Verify visual identity. _(sanity checkpoint)_
-2. Refactor: split orchestrator from HUD. Orchestrator shrinks to ~30 lines. HUD plugin gets the rest.
-3. Migrate hardcoded BUDDY out of HUD into `plugins/Pets/hud_section.py`. Pets manifest declares contribution.
-4. Visual regression check — `/rise` output identical to today.
-5. Build `plugins/Brain/` (boot_hook + hud_section + done_hook) as second consumer.
-6. Override per-project `rise.py` copies with shim or delete.
+1. ✓ Move existing `rise.py` → `~/.claude/scripts/rise.py` as-is. Update slash command. Verify visual identity. _(sanity checkpoint)_
+2. ✓ Refactor: split orchestrator from HUD. Orchestrator shrinks to ~30 lines. HUD plugin gets the rest.
+3. ✓ Migrate hardcoded BUDDY out of HUD into `plugins/Pets/hud_section.py`. Pets manifest declares contribution.
+4. ✓ Visual regression check — `/rise` output identical to today.
+5. ✓ Build `plugins/Brain/` (boot_hook + hud_section + done_hook) as second consumer.
+6. ✓ Override per-project `rise.py` copies with shim or delete. (`/rise` deleted from r29k — no boot hooks needed; all plugins passive.)
 
-Each step is a clean checkpoint — no behavior change should sneak between visual-regression-passing states.
+Each step was a clean checkpoint — no behavior change snuck between visual-regression-passing states.
 
 ---
 
