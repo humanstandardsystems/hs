@@ -200,11 +200,16 @@ Do not modify or overwrite anything in `_governance/templates/`.
 
 For each company or client name collected (including their own business):
 
-1. Create a folder at `businesses/<exact name as provided>/`
-2. Inside it, create `memory.md` with this template:
+1. Slugify the name for the folder path: lowercase, replace any run of non-alphanumeric characters (spaces, punctuation, "LLC", etc.) with a single hyphen, strip leading/trailing hyphens. Examples:
+   - "Americana Getaways LLC" → `americana-getaways-llc`
+   - "Mojave Service Group, LLC." → `mojave-service-group-llc`
+   - "Acme & Co" → `acme-co`
+2. Before creating, check if `businesses/<slug>/` already exists. If it does, leave it alone — do not overwrite, do not create a duplicate. Skip to the next name.
+3. Otherwise create the folder at `businesses/<slug>/`.
+4. Inside it, create `memory.md` with this template (use the ORIGINAL name as provided for the heading, only the folder path is slugified):
 
 ```markdown
-# <Company Name>
+# <Company Name as originally provided>
 
 ## About
 _(Add notes about this company here — type of work, key contacts, context.)_
@@ -214,7 +219,7 @@ _(Add notes about this company here — type of work, key contacts, context.)_
 
 If the companies list is empty, skip this step entirely — do not create the `businesses/` folder.
 
-Do not rename, slugify, or alter the company names. Use them exactly as the user provided.
+The slug rule keeps folder paths AI-friendly (no spaces, no shell escaping, easy to grep). The original name is preserved inside `memory.md` for human readability.
 
 ---
 
