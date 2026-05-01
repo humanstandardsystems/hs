@@ -48,6 +48,13 @@ echo "  copied startup-governance hook"
 cp "$SOURCE_DIR/_governance/templates/"*.md "$TARGET/_governance/templates/"
 echo "  copied governance templates"
 
+# ── Scaffold plugins folder ──────────────────────────────────────────────────
+mkdir -p "$TARGET/plugins"
+if [ -f "$SOURCE_DIR/plugins/README.md" ]; then
+    cp "$SOURCE_DIR/plugins/README.md" "$TARGET/plugins/README.md"
+    echo "  scaffolded plugins/ folder"
+fi
+
 # ── Write or merge CLAUDE.md ─────────────────────────────────────────────────
 CLAUDE_MD="$TARGET/.claude/CLAUDE.md"
 if [ -f "$CLAUDE_MD" ]; then
@@ -117,6 +124,40 @@ fi
 cp "$SOURCE_DIR/commands/done.md" "$USER_CLAUDE/commands/done.md"
 echo "  installed /done command (user-level)"
 
+# ── Write/prepend top-level CLAUDE.md with governance read-order ─────────────
+ROOT_CLAUDE_MD="$TARGET/CLAUDE.md"
+GOVERNANCE_MARKER="<!-- hs:governance-preamble -->"
+GOVERNANCE_BLOCK="$GOVERNANCE_MARKER
+# Read first
+
+Before responding to any user message, read these governance documents in this exact order:
+
+1. \`_governance/foundation.md\` — what AI is for
+2. \`_governance/enforcement.md\` — what happens when policy is broken
+3. \`_governance/interpretation.md\` — how to read ambiguous situations
+4. \`_governance/policy.md\` — what AI is allowed and not allowed to do
+
+Then read any \`businesses/*/memory.md\` files for company-specific context.
+
+These documents are binding on your behavior this session.
+
+If \`_governance/foundation.md\` does not exist yet, run \`/standard\` immediately to set it up before doing anything else.
+<!-- /hs:governance-preamble -->
+"
+
+if [ -f "$ROOT_CLAUDE_MD" ] && grep -qF "$GOVERNANCE_MARKER" "$ROOT_CLAUDE_MD"; then
+    echo "  CLAUDE.md governance preamble already present — leaving as-is"
+elif [ -f "$ROOT_CLAUDE_MD" ]; then
+    EXISTING_CLAUDE=$(cat "$ROOT_CLAUDE_MD")
+    {
+        printf "%s\n---\n\n%s\n" "$GOVERNANCE_BLOCK" "$EXISTING_CLAUDE"
+    } > "$ROOT_CLAUDE_MD"
+    echo "  prepended governance preamble to existing CLAUDE.md"
+else
+    printf "%s" "$GOVERNANCE_BLOCK" > "$ROOT_CLAUDE_MD"
+    echo "  created CLAUDE.md with governance preamble"
+fi
+
 # ── Drop primer.md template at project root (only if missing) ────────────────
 PRIMER="$TARGET/primer.md"
 if [ -f "$PRIMER" ]; then
@@ -131,11 +172,33 @@ USER_SETTINGS="$USER_CLAUDE/settings.json"
 ICM_BIN="$(command -v icm || true)"
 
 if [ -z "$ICM_BIN" ]; then
-    echo "" >&2
-    echo "error: ICM is required but not installed." >&2
-    echo "  Install it first, then re-run this installer:" >&2
-    echo "    brew tap rtk-ai/tap && brew install icm && icm init" >&2
-    exit 1
+    echo ""
+    echo "ICM (memory layer) is required but not installed."
+    if ! command -v brew >/dev/null 2>&1; then
+        echo "error: Homebrew isn't installed either. Install brew first:" >&2
+        echo "  /bin/bash -c \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\"" >&2
+        echo "Then re-run this installer." >&2
+        exit 1
+    fi
+    printf "Install ICM now via Homebrew? [Y/n] "
+    read -r REPLY </dev/tty || REPLY="n"
+    case "$REPLY" in
+        ""|y|Y|yes|YES)
+            brew tap rtk-ai/tap
+            brew install icm
+            icm init
+            ICM_BIN="$(command -v icm || true)"
+            if [ -z "$ICM_BIN" ]; then
+                echo "error: ICM install ran but \`icm\` still not on PATH. Open a new shell and re-run this installer." >&2
+                exit 1
+            fi
+            ;;
+        *)
+            echo "Skipping. Re-run this installer after manually installing ICM:" >&2
+            echo "    brew tap rtk-ai/tap && brew install icm && icm init" >&2
+            exit 1
+            ;;
+    esac
 fi
 
 python3 - "$USER_SETTINGS" "$ICM_BIN" <<'PY'
@@ -190,9 +253,9 @@ else:
 PY
 
 echo ""
-echo "Done. Next steps:"
-echo "  1. Open Claude Code in $TARGET"
-echo "  2. Run /standard to build your personal governance"
-echo "  3. Edit primer.md to capture current project state"
+echo "Done. Open Claude Code in $TARGET"
+echo "  - On first session, Claude reads CLAUDE.md and auto-runs /standard to build your governance."
+echo "  - After that, your governance docs in _governance/ are loaded on every session."
+echo "  - Edit primer.md to capture current project state when you're ready."
 echo ""
 echo "Your governance loads automatically every session."
