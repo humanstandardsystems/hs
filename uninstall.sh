@@ -37,10 +37,10 @@ Will REMOVE:
   - $TARGET/.claude/commands/standard.md
   - $TARGET/.claude/hooks/startup-governance.sh
   - $TARGET/_governance/templates/
-  - $TARGET/plugins/README.md
   - Governance preamble block in $TARGET/CLAUDE.md (between markers)
   - Governance hook from $TARGET/.claude/settings.json
   - $USER_CLAUDE/commands/done.md (the /done slash command)
+  - Legacy $TARGET/plugins/ scaffold, if present (older installs)
 
 Will KEEP:
   - $TARGET/_governance/foundation.md, enforcement.md, interpretation.md, policy.md

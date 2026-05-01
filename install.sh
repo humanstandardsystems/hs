@@ -48,13 +48,6 @@ echo "  copied startup-governance hook"
 cp "$SOURCE_DIR/_governance/templates/"*.md "$TARGET/_governance/templates/"
 echo "  copied governance templates"
 
-# ── Scaffold plugins folder ──────────────────────────────────────────────────
-mkdir -p "$TARGET/plugins"
-if [ -f "$SOURCE_DIR/plugins/README.md" ]; then
-    cp "$SOURCE_DIR/plugins/README.md" "$TARGET/plugins/README.md"
-    echo "  scaffolded plugins/ folder"
-fi
-
 # ── Write or merge CLAUDE.md ─────────────────────────────────────────────────
 CLAUDE_MD="$TARGET/.claude/CLAUDE.md"
 if [ -f "$CLAUDE_MD" ]; then
