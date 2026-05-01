@@ -258,4 +258,6 @@ echo "  - On first session, Claude reads CLAUDE.md and auto-runs /standard to bu
 echo "  - After that, your governance docs in _governance/ are loaded on every session."
 echo "  - Edit primer.md to capture current project state when you're ready."
 echo ""
-echo "Your governance loads automatically every session."
+echo "Source lives at $SOURCE_DIR"
+echo "  Update later: bash $SOURCE_DIR/update.sh $TARGET"
+echo "  Uninstall:    bash $SOURCE_DIR/uninstall.sh $TARGET   (see $SOURCE_DIR/UNINSTALL.md)"

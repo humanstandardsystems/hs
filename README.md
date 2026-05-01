@@ -16,22 +16,26 @@ Built on the [Human Standard](https://humanstandard.co) framework.
 ## Setup
 
 ```bash
-# 1. Install ICM (required)
-brew tap rtk-ai/tap && brew install icm && icm init
+# 1. Clone hs to the canonical sources location
+git clone https://github.com/humanstandardsystems/hs.git ~/.claude/sources/hs
 
-# 2. Clone and install
-git clone https://github.com/humanstandardsystems/hs.git
-cd your-project
-bash /path/to/hs/install.sh
+# 2. Install into your master folder (pick any path)
+bash ~/.claude/sources/hs/install.sh ~/humanstandard
 ```
 
-Then open Claude Code in your project and run:
+The installer detects whether ICM is present and offers to install it for you. Then open Claude Code in your master folder — `CLAUDE.md` auto-runs `/standard` on first session to build your governance.
 
-```
-/standard
+## Updating
+
+```bash
+bash ~/.claude/sources/hs/update.sh ~/humanstandard
 ```
 
-Claude will guide you through the governance questionnaire.
+Pulls the latest hs and re-runs install (idempotent — safe to run repeatedly).
+
+## Uninstalling
+
+See [UNINSTALL.md](UNINSTALL.md) — `bash ~/.claude/sources/hs/uninstall.sh ~/humanstandard` removes install artifacts while preserving your governance docs and businesses.
 
 ---
 
