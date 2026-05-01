@@ -5,12 +5,23 @@
 set -euo pipefail
 
 SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-TARGET="${1:-}"
 USER_CLAUDE="$HOME/.claude"
+ASSUME_YES=0
+TARGET=""
+
+# Parse args: accept -y/--yes anywhere, take first positional as TARGET.
+for arg in "$@"; do
+    case "$arg" in
+        -y|--yes) ASSUME_YES=1 ;;
+        -*) echo "unknown flag: $arg" >&2; exit 1 ;;
+        *)  [ -z "$TARGET" ] && TARGET="$arg" ;;
+    esac
+done
 
 if [ -z "$TARGET" ]; then
-    echo "usage: bash uninstall.sh <target-dir>" >&2
+    echo "usage: bash uninstall.sh [-y|--yes] <target-dir>" >&2
     echo "  e.g. bash uninstall.sh ~/humanstandard" >&2
+    echo "  -y  skip confirmation prompt (non-interactive use)" >&2
     exit 1
 fi
 
@@ -40,15 +51,25 @@ Will KEEP:
 
 EOF
 
-printf "Continue? [y/N] "
-read -r REPLY </dev/tty || REPLY="n"
-case "$REPLY" in
-    y|Y|yes|YES) ;;
-    *)
-        echo "Aborted."
-        exit 0
-        ;;
-esac
+if [ "$ASSUME_YES" -eq 1 ]; then
+    echo "Continue? [y/N] y  (--yes)"
+else
+    printf "Continue? [y/N] "
+    REPLY=""
+    if [ -r /dev/tty ]; then
+        read -r REPLY </dev/tty || REPLY="n"
+    else
+        echo "n  (no TTY — re-run with -y to confirm non-interactively)"
+        REPLY="n"
+    fi
+    case "$REPLY" in
+        y|Y|yes|YES) ;;
+        *)
+            echo "Aborted."
+            exit 0
+            ;;
+    esac
+fi
 
 rm -f "$TARGET/.claude/commands/standard.md"
 rm -f "$TARGET/.claude/hooks/startup-governance.sh"
