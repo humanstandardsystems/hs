@@ -136,11 +136,14 @@ The render library lives in the HUD plugin's repo (e.g. `~/.claude/sources/hud/r
 
 ## Discovery rules
 
-Lifecycle orchestrators (`/rise`, `/done`, etc.) scan `~/.claude/sources/*/plugin.json`. Each match is a plugin. Sort by top-level `priority` before running hooks.
+Lifecycle orchestrators (`/rise`, `/done`, etc.) scan **two tiers**, merge results, and sort by top-level `priority` (lower runs first; default 50):
 
-Plugins are **user-level**, not project-scoped. Once cloned, a plugin is active in every workspace that runs `/rise` or `/done`. Plugins that need project-specific behavior should branch on CWD or read project-local config inside their hook scripts.
+1. **User-level**: `~/.claude/sources/*/plugin.json` — distributed plugins, cloned via `clone+install`, active in every workspace.
+2. **Project-local**: `<project>/plugins/*/plugin.json` — skunkworks plugins that only fire when you're inside that project. Never distributed.
 
-There is no project-local plugin discovery path. `<project>/plugins/` was the v0 model and is no longer scanned — it was retired when the clone+install distribution pattern landed.
+Both tiers use the same `plugin.json` format. A plugin in either location is a real plugin. The two tiers serve different purposes — distributed vs experimental — and coexist by design.
+
+Discovery is implemented in `~/.claude/scripts/plugin-hooks.py` (shipped by `hs install.sh`). It returns absolute hook paths in priority order, one per line.
 
 ---
 
@@ -148,7 +151,7 @@ There is no project-local plugin discovery path. `<project>/plugins/` was the v0
 
 | What | Where | Why |
 |------|-------|-----|
-| `/rise` orchestrator | `~/.claude/scripts/rise.py` | One copy. Universal. |
+| `/rise` + `/done` plugin discovery | `~/.claude/scripts/plugin-hooks.py` | One copy. Universal. |
 | `/rise` slash command | `~/.claude/commands/rise.md` | Points at the user-level orchestrator. |
 | `/done` slash command | `~/.claude/commands/done.md` | Installed by `hs install.sh`. Scans plugin sources. |
 | Plugins | `~/.claude/sources/<name>/` | User-level. Cloned via clone+install pattern. |

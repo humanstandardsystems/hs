@@ -15,12 +15,13 @@ Update the `_Last updated:` line. Write primer.md back.
 
 ## 2. Run plugin done hooks
 
-Scan `~/.claude/sources/*/plugin.json`. For each file found:
-- Read it and check for a `done_hook` field
-- If present, read the file at that path (relative to the plugin's repo root) and follow its instructions
-- Run hooks in order of the manifest's top-level `priority` field (lower = earlier; default 50)
+```bash
+python3 ~/.claude/scripts/plugin-hooks.py --done
+```
 
-If `~/.claude/sources/` doesn't exist or no plugins declare a `done_hook`, skip this step silently. Repos in `~/.claude/sources/` without a `plugin.json` are not plugins — skip them.
+For each path returned: read that file and follow its instructions in order (paths come back priority-sorted, lower number first). If no paths returned, skip silently.
+
+The script scans both `~/.claude/sources/*/plugin.json` (user-level plugins) and `<project>/plugins/*/plugin.json` (project-local plugins) and merges by priority.
 
 ## 3. Store session summary to ICM
 

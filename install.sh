@@ -117,6 +117,12 @@ fi
 cp "$SOURCE_DIR/commands/done.md" "$USER_CLAUDE/commands/done.md"
 echo "  installed /done command (user-level)"
 
+# ── Install plugin-hooks.py (user-level) ─────────────────────────────────────
+mkdir -p "$USER_CLAUDE/scripts"
+cp "$SOURCE_DIR/scripts/plugin-hooks.py" "$USER_CLAUDE/scripts/plugin-hooks.py"
+chmod +x "$USER_CLAUDE/scripts/plugin-hooks.py"
+echo "  installed plugin-hooks.py (user-level)"
+
 # ── Write/prepend top-level CLAUDE.md with governance read-order ─────────────
 ROOT_CLAUDE_MD="$TARGET/CLAUDE.md"
 GOVERNANCE_MARKER="<!-- hs:governance-preamble -->"
